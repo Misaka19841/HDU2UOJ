@@ -13,52 +13,13 @@ def clean_description(desc):
 
 
 def build_statement_md(row):
-    desc = clean_description(row.get('description', ''))
-    input_text = row.get('input', '')
-    output_text = row.get('output', '')
-    sample_input = row.get('sample_input', '')
-    sample_output = row.get('sample_output', '')
-    hint = row.get('hint', '')
+    # 直接使用statement列内容
+    statement = row.get('statement', '').strip()
 
-    md_parts = []
+    # 将所有的 ## 替换为 ###
+    statement = statement.replace('##', '###')
 
-    md_parts.append("### 题目背景")
-    md_parts.append(desc if desc else "（无）")
-    md_parts.append("")
-
-    md_parts.append("### 输入格式")
-    md_parts.append(input_text if input_text else "（无）")
-    md_parts.append("")
-
-    md_parts.append("### 输出格式")
-    md_parts.append(output_text if output_text else "（无）")
-    md_parts.append("")
-
-    md_parts.append("### 输入输出样例")
-
-    md_parts.append("#### 输入")
-    if sample_input and sample_input.strip():
-        md_parts.append("```")
-        md_parts.append(sample_input)
-        md_parts.append("```")
-    else:
-        md_parts.append("（无）")
-    md_parts.append("")
-
-    md_parts.append("#### 输出")
-    if sample_output and sample_output.strip():
-        md_parts.append("```")
-        md_parts.append(sample_output)
-        md_parts.append("```")
-    else:
-        md_parts.append("（无）")
-    md_parts.append("")
-
-    if hint and hint.strip():
-        md_parts.append("### 提示")
-        md_parts.append(hint)
-
-    return '\n'.join(md_parts)
+    return statement
 
 
 def escape_sql_string(s):
@@ -76,18 +37,21 @@ def generate_sql(csv_file, output_sql_file):
 
         for row in reader:
             title = row.get('title', '').strip()
+            pid = row.get('pid', '')
+
+            # 如果title为空，使用PID作为备用
             if not title:
-                desc_first = row.get('description', '').split('\n')[0].strip()
-                title = re.sub(r'^\*\*|\*\*$', '', desc_first)
+                title = f"题目 {pid}"
 
             submission_req = json.dumps([
                 {"name": "answer", "type": "source code", "file_name": "answer.code"}
             ], ensure_ascii=False)
 
+            # 构建statement_md（直接使用statement列，并替换##为###）
             statement_md = build_statement_md(row)
 
             records.append({
-                'pid': row.get('pid', ''),
+                'pid': pid,
                 'title': title,
                 'submission_req': submission_req,
                 'statement_md': statement_md
@@ -102,8 +66,7 @@ def generate_sql(csv_file, output_sql_file):
                 f"INSERT INTO problems (title, submission_requirement) VALUES ('{escape_sql_string(rec['title'])}', '{escape_sql_string(rec['submission_req'])}');\n")
             f.write("SET @last_id = LAST_INSERT_ID();\n")
             f.write(
-                f"INSERT INTO problems_contents (id, statement, statement_md) VALUES (@last_id, '', '{escape_sql_string(rec['statement_md'])}');\n")
-            f.write("\n")
+                f"INSERT INTO problems_contents (id, statement, statement_md) VALUES (@last_id, '', '{escape_sql_string(rec['statement_md'])}');\n\n")
 
         f.write("COMMIT;\n")
 
@@ -113,14 +76,16 @@ def generate_sql(csv_file, output_sql_file):
 
 if __name__ == '__main__':
     import os
+    import glob
 
-    # 如果没有指定CSV文件，就找最新的 hdu_contest_*.csv
+    # 如果没有指定CSV文件，就找最新的 contest_problems.csv
     if len(sys.argv) > 1:
         csv_file = sys.argv[1]
     else:
-        import glob
+        csv_files = glob.glob('contest_problems.csv')
+        if not csv_files:
+            csv_files = glob.glob('hdu_contest_*.csv')
 
-        csv_files = glob.glob('hdu_contest_*.csv')
         if csv_files:
             csv_file = csv_files[-1]  # 取最新的
             print(f"自动选择CSV文件: {csv_file}")
