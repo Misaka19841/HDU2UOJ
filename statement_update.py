@@ -10,8 +10,8 @@ def main():
     BASE_URL = "http://dut-cpc.cn"
 
     # 题目 ID 范围（SQL 导入后得到的实际 ID）
-    start_id = 73  # 请根据实际情况修改
-    end_id = 82  # 请根据实际情况修改
+    start_id = 83  # 请根据实际情况修改
+    end_id = 95  # 请根据实际情况修改
 
     # 固定的 tags（URL 编码后的值）
     PROBLEM_TAGS = "hdu春季联赛,2025"

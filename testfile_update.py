@@ -8,8 +8,8 @@ def main():
     BASE_URL = "http://dut-cpc.cn"
 
     # 题目 ID 范围
-    start_id = 73
-    end_id = 82
+    start_id = 83
+    end_id = 95
 
     # Cookie
     COOKIE_STRING = "pma_lang=zh_CN; UOJSESSID=atj30vb4a1809gmv1b948f3sok; uoj_username=admin; uoj_username_checksum=286c66fbce991b3b9331d75885c80738; uoj_remember_token=epBkl4u3Kepe0BdA8FULr3NHpZSf2SsZbjrz1QqCKk8pn1QLg0cXAXzSl60Z; uoj_remember_token_checksum=e03b4eef7d53d572bcd75fe4cab7d34d; phpMyAdmin=t75b761h8nqclt2ed3bilvfkjn; pmaUser-1=PAGsIu721BLGDcC8dN4NUEUcUsjclF2TuMQ0qPrj5PDvbnKG8PaJh7nfUOo%3D; pmaAuth-1=tRfChl%2FDfopQfU4MGVEQhHgF391vI3EXqza2BrpIkkT4CKnbIR%2FinUGEJxaIRPIC3yhurHuieQH1wXB7josWGE7x8k4RXBeze%2FxGLvltv6peBCiJK54m"
